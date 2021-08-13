@@ -66,6 +66,7 @@ class arc_o365(object):
 
 
         if not account.is_authenticated:
+            log.info(f"Authenticating account associated with file { token_filename }")
             account.authenticate()
             if not account.is_authenticated:
                 log.fatal(f"Cannot authenticate account")
