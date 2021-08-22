@@ -43,7 +43,7 @@ class arc_o365(object):
         """
         return copy.copy(_scopes_default)
 
-    def __init__(self, config, scopes=_scopes_default, add_scopes=None, token_filename=_token_filename_default):
+    def __init__(self, config, scopes=_scopes_default, add_scopes=None, token_filename=_token_filename_default, **kwargs):
         """ Initialized the ms graph API.
 
             config -- a dict of the configuration parameters
@@ -61,7 +61,7 @@ class arc_o365(object):
 
         token_backend = O365.FileSystemTokenBackend(token_path='.', token_filename=token_filename)
         #log.info("before account object creation")
-        account = O365.Account(credentials, scopes=scopes, token_backend=token_backend)
+        account = O365.Account(credentials, scopes=scopes, token_backend=token_backend, **kwargs)
         #log.info(f"after account object creation: { account }")
 
 
