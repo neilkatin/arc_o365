@@ -33,17 +33,10 @@ _scopes_default = [
 _token_filename_default = "o365_token.txt"
 
 
+
 class arc_o365(object):
 
-    @staticmethod
-    def get_default_scopes():
-        """ return the default scopes we use for MS graph API.
-
-            The returned array is a copy, so can be freely modified by the caller
-        """
-        return copy.copy(_scopes_default)
-
-    def __init__(self, config, scopes=_scopes_default, add_scopes=None, token_filename=_token_filename_default, **kwargs):
+    def __init__(self, config, token_filename, scopes=_scopes_default, add_scopes=None, **kwargs):
         """ Initialized the ms graph API.
 
             config -- a dict of the configuration parameters
