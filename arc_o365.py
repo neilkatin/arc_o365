@@ -1,6 +1,9 @@
 
 import copy
 import logging
+import datetime
+import re
+import base64
 
 #import O365_local as O365
 import O365
@@ -33,6 +36,7 @@ _scopes_default = [
 _token_filename_default = "o365_token.txt"
 
 
+MATCH_TO_FIRST_UNDERSCORE = re.compile(r"^([^_]+)_")
 
 class arc_o365(object):
 
@@ -45,7 +49,6 @@ class arc_o365(object):
             add_scopes -- additional scopes to add to request
 
         """
-
         credentials = (config.CLIENT_ID, config.CLIENT_SECRET)
 
         if add_scopes is not None:
@@ -88,7 +91,7 @@ class arc_o365(object):
         if len(message_list) == 0:
             log.debug(f"No messages found")
         else:
-            log.debug(f"found { len(message_list} } messages")
+            log.debug(f"found { len(message_list) } messages")
 
         return message_list
 
@@ -97,9 +100,9 @@ class arc_o365(object):
     def fetch_workforce_reports(self, dro_id, limit=1):
 
         message_match_string = f"DR { dro_id } Automated Workforce Reports"
-        message = search_mail(self.account(), self.config.PROGRAM_EMAIL, message_match_string, limit=limit)
+        message_list = self.search_mail(self.config.PROGRAM_EMAIL, message_match_string, limit=1)
 
-        if message is None:
+        if len(message_list) == 0:
             error = f"Could not find an email that matches '{ message_match_string }'"
             log.fatal(error)
             raise(Exception(error))
@@ -124,7 +127,10 @@ class arc_o365(object):
             return_list.append(attach_dict)
 
         if limit == 1:
-            return message_list[0] if len(message_list) > 0 else return None
+            if len(message_list) > 0:
+                return return_list[0]
+            else:
+                return None
         else:
             return return_list
 
