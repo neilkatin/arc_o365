@@ -40,9 +40,9 @@ class arc_o365(object):
         """ Initialized the ms graph API.
 
             config -- a dict of the configuration parameters
-            config_static -- the statically configured elements; only used to detect misconfiguration of security critical values that should not be checked into source control
-            scopes -- the security scopes that will be requested
             token_filename -- the file used to store the security token
+            scopes -- the security scopes that will be requested
+            add_scopes -- additional scopes to add to request
 
         """
 
@@ -66,9 +66,70 @@ class arc_o365(object):
                 raise Exception("Could not authenticate with MS Graph API")
 
         self.account = account
+        self.config = config
 
     def get_account(self):
         return self.account
+
+
+    # search the specified email address for mail matching the specified subject pattern.
+    def search_mail(self, email_address, subj_pattern, limit=1):
+
+        mailbox = self.get_account().mailbox(resource=email_address)
+        builder = mailbox.new_query()
+        dt = datetime.datetime(1900, 1, 1)
+        matcher = builder.chain_and(
+                builder.greater('sentDateTime', dt),
+                builder.contains("subject", subj_pattern))
+
+        messages = mailbox.get_messages(query=matcher, order_by="sentDateTime desc", limit=limit, download_attachments=True)
+        message_list = list(messages)
+
+        if len(message_list) == 0:
+            log.debug(f"No messages found")
+        else:
+            log.debug(f"found { len(message_list} } messages")
+
+        return message_list
+
+
+    # fetch workforce reports from the specified shared mailbox
+    def fetch_workforce_reports(self, dro_id, limit=1):
+
+        message_match_string = f"DR { dro_id } Automated Workforce Reports"
+        message = search_mail(self.account(), self.config.PROGRAM_EMAIL, message_match_string, limit=limit)
+
+        if message is None:
+            error = f"Could not find an email that matches '{ message_match_string }'"
+            log.fatal(error)
+            raise(Exception(error))
+
+
+        return_list = []
+        for message in message_list:
+            attach_dict = {}
+            # read the attachments
+            for attachment in message.attachments:
+                attach_name = attachment.name
+                name_type = attach_name
+                name_before_underscore = MATCH_TO_FIRST_UNDERSCORE.match(attach_name)
+
+                if name_before_underscore is not None:
+                    name_type  = name_before_underscore.group(1)
+
+                #log.debug(f"attachment { attachment.name } name_type { name_type } size { attachment.size }")
+                attach_dict[name_type] = base64.b64decode(attachment.content)
+
+            attach_dict['subject'] = message.subject
+            return_list.append(attach_dict)
+
+        if limit == 1:
+            return message_list[0] if len(message_list) > 0 else return None
+        else:
+            return return_list
+
+
+
 
 import dotenv
 def main():
