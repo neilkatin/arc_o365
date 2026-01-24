@@ -40,7 +40,7 @@ MATCH_TO_FIRST_UNDERSCORE = re.compile(r"^([^_]+)_")
 
 class arc_o365(object):
 
-    def __init__(self, config, token_filename, scopes=_scopes_default, add_scopes=None, **kwargs):
+    def __init__(self, config, token_filename, scopes=None, add_scopes=None, **kwargs):
         """ Initialized the ms graph API.
 
             config -- a dict of the configuration parameters
@@ -50,6 +50,9 @@ class arc_o365(object):
 
         """
         credentials = (config.CLIENT_ID, config.CLIENT_SECRET)
+
+        if scopes is None:
+            scopes = _scopes_default
 
         if add_scopes is not None:
             scopes = copy.copy(scopes)
