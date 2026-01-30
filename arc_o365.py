@@ -52,7 +52,11 @@ class arc_o365(object):
         credentials = (config.CLIENT_ID, config.CLIENT_SECRET)
 
         if scopes is None:
+            log.info("arc_o365: scopes was None; using defaults")
             scopes = _scopes_default
+        else:
+            log.info(f"arc_o365: scopes was { scopes }")
+
 
         if add_scopes is not None:
             scopes = copy.copy(scopes)
@@ -60,13 +64,13 @@ class arc_o365(object):
 
         token_backend = O365.FileSystemTokenBackend(token_path='.', token_filename=token_filename)
         #log.info("before account object creation")
-        account = O365.Account(credentials, scopes=scopes, token_backend=token_backend, **kwargs)
+        account = O365.Account(credentials, token_backend=token_backend, **kwargs)
         #log.info(f"after account object creation: { account }")
 
 
         if not account.is_authenticated:
-            log.info(f"Authenticating account associated with file { token_filename }")
-            account.authenticate()
+            log.info(f"Authenticating account associated with file { token_filename }.  Scopes { scopes }")
+            account.authenticate(requested_scopes=scopes)
             if not account.is_authenticated:
                 log.fatal(f"Cannot authenticate account")
                 raise Exception("Could not authenticate with MS Graph API")
