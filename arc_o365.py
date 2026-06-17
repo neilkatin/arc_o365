@@ -52,10 +52,11 @@ class arc_o365(object):
         credentials = (config.CLIENT_ID, config.CLIENT_SECRET)
 
         if scopes is None:
-            log.info("arc_o365: scopes was None; using defaults")
+            #log.info("arc_o365: scopes was None; using defaults")
             scopes = _scopes_default
         else:
-            log.info(f"arc_o365: scopes was { scopes }")
+            #log.info(f"arc_o365: scopes was { scopes }")
+            pass
 
 
         if add_scopes is not None:
