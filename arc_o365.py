@@ -105,13 +105,15 @@ class arc_o365(object):
 
 
     # fetch workforce reports from the specified shared mailbox
-    def fetch_workforce_reports(self, dro_id, limit=1):
+    def fetch_workforce_reports(self, dro_id, subject_match_string=None, limit=1):
 
-        message_match_string = f"DR { dro_id } Automated Workforce Reports"
-        message_list = self.search_mail(self.config.PROGRAM_EMAIL, message_match_string, limit=1)
+
+        if subject_match_string is None:
+            subject_match_string = f"DR { dro_id } Automated Workforce Reports"
+        message_list = self.search_mail(self.config.PROGRAM_EMAIL, subject_match_string, limit=1)
 
         if len(message_list) == 0:
-            error = f"Could not find an email that matches '{ message_match_string }'"
+            error = f"Could not find an email that matches '{ subject_match_string }'"
             log.fatal(error)
             raise(Exception(error))
 
@@ -132,6 +134,7 @@ class arc_o365(object):
                 attach_dict[name_type] = base64.b64decode(attachment.content)
 
             attach_dict['subject'] = message.subject
+            attach_dict['created'] = message.created
             return_list.append(attach_dict)
 
         if limit == 1:
