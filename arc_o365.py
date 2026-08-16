@@ -33,9 +33,6 @@ _scopes_default = [
         'basic',
         ]
 
-_token_filename_default = "o365_token.txt"
-
-
 MATCH_TO_FIRST_UNDERSCORE = re.compile(r"^([^_]+)_")
 
 class arc_o365(object):
