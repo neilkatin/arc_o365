@@ -9,6 +9,7 @@ import re
 import O365.excel
 import openpyxl
 import openpyxl.utils
+import requests
 
 
 import neil_tools
@@ -86,8 +87,8 @@ class O365Config:
         self._config_tables = {}
         for name, member in ConfigTables.__members__.items():
             table_name = member.value
+            #log.debug(f"about to read in table { name } from spreadsheet table { table_name }")
             self._config_tables[name] = self.read_table_to_dict(table_name)
-            #log.debug(f"read in table { name } from spreadsheet table { table_name }")
 
 
 
@@ -136,9 +137,9 @@ class O365Config:
                 raise
 
             # copy from the templates folder, which we assume exists
-            template_item = self.template_folder.get_drive().get_item_by_path(template_path.as_posix())
+            template_item = self._template_folder.get_drive().get_item_by_path(template_path.as_posix())
             copy_op = template_item.copy(target=self.dr_folder, name=file_name)
-            for status, percent_complete in coyp_op.check_status(delay=1):
+            for status, percent_complete in copy_op.check_status(delay=1):
                 log.debug(f"copy_op: status { status } %complete { percent_complete}")
             item = copy_op.get_item()
             log.debug(f"copy_op: item { item }")
