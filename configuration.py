@@ -378,7 +378,7 @@ class O365Config:
                     # include or exclude: we're done with matching
                     return
 
-            log.debug(f"no match for { email } gap { gap }")
+            #log.debug(f"no match for { email } gap { gap }")
 
         #log.debug(f"run_match_patterns2: extra_recipients { extra_recipients }")
 
