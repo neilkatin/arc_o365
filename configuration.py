@@ -107,9 +107,10 @@ class O365Config:
                 folder_path = pathlib.Path(folder_name)
                 parent_path = folder_path.parent
                 log.info(f"need to create per-dr folder '{ folder_name }' in parent '{ parent_path.as_posix() }'")
-                if parent_path.as_posix() == '/':
+                if parent_path.as_posix() == '/' or parent_path.as_posix() == '.':
                     parent = self.dr_drive.get_root_folder()
                 else:
+                    #log.debug(f"not root rolder.  parent_path '{ parent_path.as_posix()}'")
                     parent = self.dr_drive.get_item_by_path(parent_path.as_posix())
 
                 log.debug(f"trying to create folder '{ folder_path.name }'")
